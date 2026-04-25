@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML 收藏夹 ✨</title>
+  <script src="https://unpkg.com/vue@3"></script>
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fff7fb;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      color: #ff6fa5;
+    }
+
+    .input-box {
+      background: white;
+      padding: 15px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    input, textarea {
+      width: 100%;
+      margin-top: 8px;
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid #eee;
+      outline: none;
+    }
+
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    button {
+      background: #ff8fab;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: white;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+
+    button:hover {
+      background: #ff6fa5;
+    }
+
+    .item {
+      background: white;
+      border-radius: 16px;
+      padding: 15px;
+      margin-top: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: 0.2s;
+    }
+
+    .item:hover {
+      transform: translateY(-3px);
+    }
+
+    .title {
+      cursor: pointer;
+      font-weight: bold;
+      color: #ff6fa5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .content {
+      margin-top: 10px;
+      padding: 10px;
+      background: #fafafa;
+      border-radius: 10px;
+    }
+
+    .empty {
+      color: #aaa;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+<div id="app">
+
+  <h1>✨ HTML 收藏夹</h1>
+
+  <!-- 输入区域 -->
+  <div class="input-box">
+    <input v-model="title" placeholder="给这个模块起个名字（比如：渐变按钮）">
+    <textarea v-model="input" placeholder="粘贴你的 HTML 代码"></textarea>
+    <button @click="add">添加</button>
+  </div>
+
+  <!-- 列表 -->
+  <div v-if="items.length === 0" class="empty">
+    还没有收藏任何内容～
+  </div>
+
+  <div v-for="(item, index) in items" :key="index" class="item">
+    
+    <div class="title" @click="toggle(item)">
+      <span>{{ item.title || '未命名模块' }}</span>
+      <span>{{ item.open ? '▲' : '▼' }}</span>
+    </div>
+
+    <div v-if="item.open" class="content">
+      <div v-html="item.content"></div>
+      <br>
+      <button @click="remove(index)">删除</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const app = Vue.createApp({
+  data() {
+    return {
+      title: "",
+      input: "",
+      items: JSON.parse(localStorage.getItem("html_items") || "[]")
+    }
+  },
+
+  methods: {
+    add() {
+      if (!this.input.trim()) return
+
+      this.items.unshift({
+        title: this.title,
+        content: this.input,
+        open: false
+      })
+
+      this.title = ""
+      this.input = ""
+      this.save()
+    },
+
+    toggle(item) {
+      item.open = !item.open
+      this.save()
+    },
+
+    remove(index) {
+      if (confirm("确定删除？")) {
+        this.items.splice(index, 1)
+        this.save()
+      }
+    },
+
+    save() {
+      localStorage.setItem("html_items", JSON.stringify(this.items))
+    }
+  }
+})
+
+app.mount("#app")
+</script>
+
+</body>
+</html>
